@@ -1,9 +1,9 @@
-import themidibus.*; //Import the library
+import themidibus.*; //MIDI //<>//
 
-import processing.serial.*;
-import processing.sound.*;
+//import processing.serial.*;
+//import processing.sound.*; 
 
-import hypermedia.net.UDP;
+import hypermedia.net.UDP; //UDP
 import java.io.File;
 import java.io.IOException;
 
@@ -14,11 +14,11 @@ import org.apache.avro.generic.GenericRecord;
 import java.io.EOFException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-float rotX=0, rotY=0, rotZ=0, camX=0, camY=0, camZ=-200;
-int udp_port=8123; //port8123
+float rotX=0, rotY=0, rotZ=0, camX=0, camY=0, camZ=-300;
+int udp_port; 
 PFont font ;
 Clusters tpx;
-int lastTime = 0;
+int lastTime;
 
 MidiBus myBus;
 boolean startedListening=false;
@@ -27,17 +27,21 @@ void setup() {
   size(255, 255, P3D);
   tpx = new Clusters(udp_port);
   myBus = new MidiBus(this, 0, 1); // Create a new MidiBus with no input device and the default Java Sound Synthesizer as the output device.
-  //delay(3000);
+  delay(1000);  //without this delay the program doesn't run!
   font = loadFont ("font.vlw");
   //arduino= new Serial(this , "/dev/tty.usbmodem14241" , 9600);
   //arduino.bufferUntil('\n'); //\r
   //tpx.stopListening();
+  lastTime = millis();
+  udp_port=0; //iPadPix port 8123
 }
+
+
 
 void update() {
   if (keyPressed)
   {
-    if (key =='r')
+    if (key ==' ')
     {
       rotX=0;
       rotY=0;
@@ -54,7 +58,8 @@ void update() {
 }
 
 void draw() {
-  if (millis() > 4000 && startedListening == false) {
+  update();
+  if (startedListening == false && millis() > 4000 && udp_port != 0) {
     tpx.startListening();
     startedListening= true;
   }
@@ -81,7 +86,8 @@ void draw() {
     //  Cluster myCluster = it.next();
     if ( myCluster.alive == true) {
       myCluster.sound();
-      myCluster.draw(); //[i]
+      //myCluster.draw(); //[i]
+      print("c ");
     }
     do {
       myCluster.age=(millis()-myCluster.creationTime);
@@ -95,6 +101,7 @@ void draw() {
     }
   }
   //clean up
+  println();
   for (Integer num : ClustersToDelete) {
     tpx.tpx_clusters.remove(num);
   }

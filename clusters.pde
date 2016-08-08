@@ -42,7 +42,7 @@ public class Clusters {
   }
   void receive(byte[] data) {
     //skip first packet here to prevent strange hangups 
-    if (firstPacket && connectionPort == 0) {
+    if (firstPacket && connectionPort != 0) {
       firstPacket=false;
       return;
     }

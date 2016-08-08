@@ -15,7 +15,7 @@ class Cluster {
   PVector velocity;
   PVector center;
   int type; //0 = electron, 1=photon, 2=e or photon 3=alpha particle 4=muon 5= unknown
-  SqrOsc square;
+  //SqrOsc square;
   boolean played;
 
   //create new cluster object
