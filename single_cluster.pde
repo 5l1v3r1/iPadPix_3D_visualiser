@@ -250,9 +250,10 @@ class Cluster {
       int agogoL = 48;
       int crash  = 49;
       int crashL = 49;   
+      int diff = 0;
             
       if (type == 0) {         //0 = electron
-        note = new Note(channel, claves, velocity); //crash
+        note = new Note(channel, claves, 127); //crash
         partLevel = clavesL;
       } else if (type == 1 ) { //1=photon
         note = new Note(channel, clap, velocity);
@@ -267,14 +268,15 @@ class Cluster {
         note = new Note(channel, snare, velocity);
         partLevel = snareL;
       } else if (type == 5 ) { //5= unknown
-        note = new Note(channel, kick, velocity); //opHat
+        note = new Note(channel, kick, 70); //opHat
+        diff = -10;
         partLevel = kickL;
       }
       //note = new Note(channel, 75, velocity);
 
       myBus.sendNoteOn(note);
-      ControlChange change = new ControlChange(channel, partLevel, round(map(totalEnergy,4, 5*1000,40,127)));
-      myBus.sendControllerChange(change); // Send a controllerChange
+      ControlChange change = new ControlChange(channel, partLevel, round(map(totalEnergy,4, 5*1000,40,127))+diff);
+      //myBus.sendControllerChange(change); // Send a controllerChange
       played=true;
       delay(round(random(0, 100)));
       //delay(3000);

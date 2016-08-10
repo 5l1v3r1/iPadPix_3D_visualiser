@@ -4,7 +4,7 @@ import java.nio.Buffer;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-
+String HOST_IP = "192.168.1.100";
 public class Clusters {
   UDP udp;
   Schema schema; 
@@ -17,7 +17,7 @@ public class Clusters {
 
     connectionPort = port;
     tpx_clusters = new ArrayList<Cluster>(); //CopyOnWriteArrayList<Cluster>(); 
-    udp= new UDP(this, port);
+    udp= new UDP(this, port); //HOST_IP);
     lock=false;
     //udp.log(true);
     udp.listen(false);
@@ -44,6 +44,7 @@ public class Clusters {
     //skip first packet here to prevent strange hangups 
     if (firstPacket && connectionPort != 0) {
       firstPacket=false;
+      print("first packet skipped");
       return;
     }
     print("packet size: ");

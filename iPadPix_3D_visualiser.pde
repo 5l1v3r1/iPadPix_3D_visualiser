@@ -23,17 +23,22 @@ int lastTime;
 MidiBus myBus;
 boolean startedListening=false;
 
+boolean DRAW;
+
 void setup() {
-  size(255, 255, P3D);
+  size(512, 512, P3D);
+  //delay(3000);
+  udp_port=8123; //iPadPix port 8123
   tpx = new Clusters(udp_port);
   myBus = new MidiBus(this, 0, 1); // Create a new MidiBus with no input device and the default Java Sound Synthesizer as the output device.
-  delay(1000);  //without this delay the program doesn't run!
+  delay(3000);  //without this delay the program doesn't run!
   font = loadFont ("font.vlw");
   //arduino= new Serial(this , "/dev/tty.usbmodem14241" , 9600);
   //arduino.bufferUntil('\n'); //\r
   //tpx.stopListening();
   lastTime = millis();
-  udp_port=0; //iPadPix port 8123
+  DRAW = false;
+  print("setup done");
 }
 
 
@@ -48,32 +53,35 @@ void update() {
       camX=0;
       camY=0;
       camZ=-300;
+      Note note = new Note(9, 36, 127);
+      myBus.sendNoteOn(note);
     }
   }
   if ( udp_port == 0  && (millis() - lastTime) > random(1*100, 3*1500)) {
     Cluster newCluster = tpx.randomCluster();  
     tpx.addCluster(newCluster); // the same: tpx.tpx_clusters.add(tpx.randomCluster());
     lastTime = millis();
+  } else if (startedListening == false && ((millis() - lastTime) > 4000) && udp_port != 0) {
+    tpx.startListening();
+    startedListening= true;
   }
 }
 
 void draw() {
   update();
-  if (startedListening == false && millis() > 4000 && udp_port != 0) {
-    tpx.startListening();
-    startedListening= true;
+  if(DRAW){
+    textFont(font);
+    lights();
+    background(0);
+    //noStroke();
+    translate(camX, camY, camZ);
+    translate(width/2.0-camX, height/2.0-camY);
+    rotateY(rotY);
+    rotateX(rotX);
+    rotateZ(rotZ);
+    translate(-(width/2.0-camX), -(height/2.0-camY));
+    drawCenterObject();
   }
-  textFont(font);
-  lights();
-  background(0);
-  //noStroke();
-  translate(camX, camY, camZ);
-  translate(width/2.0-camX, height/2.0-camY);
-  rotateY(rotY);
-  rotateX(rotX);
-  rotateZ(rotZ);
-  translate(-(width/2.0-camX), -(height/2.0-camY));
-  drawCenterObject();
 
   List<Integer> ClustersToDelete = new ArrayList<Integer>();
 
@@ -86,8 +94,10 @@ void draw() {
     //  Cluster myCluster = it.next();
     if ( myCluster.alive == true) {
       myCluster.sound();
-      //myCluster.draw(); //[i]
-      print("c ");
+      if(DRAW){
+        myCluster.draw(); //[i]
+      }
+      //print("c ");
     }
     do {
       myCluster.age=(millis()-myCluster.creationTime);
@@ -99,9 +109,9 @@ void draw() {
       //tpx.lock = false;
       myCluster=null;
     }
+    //println();
   }
   //clean up
-  println();
   for (Integer num : ClustersToDelete) {
     tpx.tpx_clusters.remove(num);
   }
