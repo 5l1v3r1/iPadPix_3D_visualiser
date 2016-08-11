@@ -1,4 +1,4 @@
-import org.apache.avro.util.Utf8; //<>// //<>//
+import org.apache.avro.util.Utf8; //<>// //<>// //<>//
 import java.nio.ByteBuffer;
 import java.nio.Buffer;
 import java.util.*;
@@ -11,17 +11,20 @@ public class Clusters {
   List<Cluster> tpx_clusters; // CopyOnWriteArrayList
   boolean firstPacket;
   int connectionPort;
-  boolean lock;
+  boolean lock, recordClusters;
+  int recordCounter;
 
   Clusters (int port) { 
 
     connectionPort = port;
-    tpx_clusters = new ArrayList<Cluster>(); //CopyOnWriteArrayList<Cluster>(); 
+    tpx_clusters = new ArrayList<Cluster>(); //CopyOnWriteArrayList<Cluster>(); // 
     udp= new UDP(this, port); //HOST_IP);
     lock=false;
     //udp.log(true);
     udp.listen(false);
     firstPacket = true;
+    recordClusters = false;
+    recordCounter= 0;
     try {
       schema = new Schema.Parser().parse(new File("/Users/ozel/Documents/Processing/iPadPix_3D_visualiser/data/tpx.json"));
     } 
@@ -31,6 +34,7 @@ public class Clusters {
   }
   void addCluster(Cluster newCluster) {
     while (lock == true) {
+      Thread.yield();
     };
     tpx_clusters.add(newCluster);
   }
@@ -40,15 +44,16 @@ public class Clusters {
     //println(newCluster.type);
     return newCluster;
   }
-  void receive(byte[] data) {
-    //skip first packet here to prevent strange hangups 
+  void parsePacket(byte[] data){
+    //skip first packet here to prevent strange hangups  //<>//
     if (firstPacket && connectionPort != 0) {
       firstPacket=false;
       print("first packet skipped");
       return;
     }
-    print("packet size: ");
-    println(data.length);
+    print("packet size: "); //<>//
+    print(data.length);
+    print(" ");
 
     try {
       ByteArrayInputStream inputStream =  new ByteArrayInputStream(data);
@@ -61,7 +66,7 @@ public class Clusters {
       if (crs !=  null) {
         print("clusters: ");
         println(crs.size());
-        //println(clusters);
+        //println(crs);
         ByteBuffer bbx, bby = null;
         //ByteBuffer b = ByteBuffer.allocate(2000);
 
@@ -81,10 +86,12 @@ public class Clusters {
           GenericData.Array energy_array = (GenericData.Array)cr.get("ei");
 
           //loop through all pixel data of one cluster
-          for (int i = 0; i < energy_array.size(); i++) {
-            //print( (int) bresult[i] & 0xff); print(" ");
-            cluster.addPixel((int) (bx[i] & 0xff), (int) (by[i] & 0xff), (int)energy_array.get(i));
-          }
+          //FIXME: somthing is not correct here, throws sometimes exceptions (UTF8 problem?)
+          //for now we don't use individual pixel anyway
+          //for (int i = 0; i < energy_array.size(); i++) {
+          //  //print( (int) bresult[i] & 0xff); print(" ");
+          //  cluster.addPixel((int) (bx[i] & 0xff), (int) (by[i] & 0xff), (int)energy_array.get(i));
+          //}
           cluster.type=cluster.clusterType();
           addCluster(cluster);
 
@@ -97,6 +104,13 @@ public class Clusters {
     catch(Exception ex) {
       ex.printStackTrace();
     }
+  }
+  void receive(byte[] data) {
+    if(recordClusters){
+       saveBytes("recordedClusters/" + recordCounter + ".dat", data); 
+       recordCounter++;
+    }
+    parsePacket(data);
   }
   void startListening() {
     if(connectionPort > 0)  udp.listen(true);
