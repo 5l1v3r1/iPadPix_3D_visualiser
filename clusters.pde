@@ -61,13 +61,13 @@ public class Clusters {
       if (decoder == null) return;
       GenericDatumReader<GenericRecord> reader = new GenericDatumReader<GenericRecord>(schema);
       GenericRecord result = reader.read(null, decoder);
-      //println(result);
+      println(result);
       GenericData.Array<GenericRecord> crs = (GenericData.Array)result.get("clusterArray");
       if (crs !=  null) {
         print("clusters: ");
-        println(crs.size());
+        print(crs.size());
         //println(crs);
-        ByteBuffer bbx, bby = null;
+        //ByteBuffer bbx, bby = null;
         //ByteBuffer b = ByteBuffer.allocate(2000);
 
         //loop through all clusters in the received packet
@@ -77,29 +77,35 @@ public class Clusters {
           //new cluster
           Cluster cluster = new Cluster((float)cr.get("center_x"), (float)cr.get("center_y"), (float)cr.get("energy"));
 
-          bbx = (ByteBuffer)cr.get("xi");
-          byte[] bx = new byte[bbx.remaining()];
-          bbx.get(bx);
-          bby = (ByteBuffer)cr.get("yi");
-          byte[] by = new byte[bby.remaining()];
-          bby.get(by);
+          //bbx = (ByteBuffer)cr.get("xi");
+          //byte[] bx = new byte[bbx.remaining()];
+          //bbx.get(bx);
+          //bby = (ByteBuffer)cr.get("yi");
+          //byte[] by = new byte[bby.remaining()];
+          //bby.get(by);
+          
+          GenericData.Array xi_array = (GenericData.Array)cr.get("xi");
+          GenericData.Array yi_array = (GenericData.Array)cr.get("yi");
           GenericData.Array energy_array = (GenericData.Array)cr.get("ei");
 
           //loop through all pixel data of one cluster
           //FIXME: somthing is not correct here, throws sometimes exceptions (UTF8 problem?)
           //for now we don't use individual pixel anyway
-          //for (int i = 0; i < energy_array.size(); i++) {
-          //  //print( (int) bresult[i] & 0xff); print(" ");
-          //  cluster.addPixel((int) (bx[i] & 0xff), (int) (by[i] & 0xff), (int)energy_array.get(i));
-          //}
+          for (int i = 0; i < energy_array.size(); i++) {
+            //print( (int) bresult[i] & 0xff); print(" ");
+            //cluster.addPixel((int) (bx[i] & 0xff), (int) (by[i] & 0xff), (int)energy_array.get(i));
+            //print(xi_array.get(i)  + " " + yi_array.get(i)  + " " + energy_array.get(i));
+            cluster.addPixel((int)xi_array.get(i), (int)yi_array.get(i), (int)energy_array.get(i));
+          }
           cluster.type=cluster.clusterType();
           addCluster(cluster);
-
-          //println(cluster);
+          print(" type: ");
+          print(cluster.type);
           //println(cluster.get("yi"));
           //println(cr.get("ei"));
         }
       }
+      println();
     }
     catch(Exception ex) {
       ex.printStackTrace();

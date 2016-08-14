@@ -24,9 +24,9 @@ boolean startedListening=false;
 
 boolean DRAW = false;
 PFont font ;
-Schema schema2;
 String[] filenames;
 boolean useRecordedClusters;
+Schema schema2;
 
 void setup() {
   //size(512, 512, P3D);
@@ -47,7 +47,7 @@ void setup() {
   println("found " + filenames.length + " recorded cluster packets");
 
   try {
-    schema2 = new Schema.Parser().parse(new File("/Users/ozel/Documents/Processing/iPadPix_3D_visualiser/data/tpx.json"));
+    schema2 = new Schema.Parser().parse(new File("/Users/ozel/Documents/Processing/iPadPix_3D_visualiser/data/tpx2.json"));
   } 
   catch (IOException e) {
     System.err.println(e);
@@ -74,7 +74,7 @@ void update() {
       println("stored clusters: " + tpx.tpx_clusters.size());
     }
   }
-  if ( udp_port == 0  && (millis() - lastTime) > random(1*100, 3*1500)) {
+  if ( udp_port == 0  && (millis() - lastTime) > random(1500, 3*1500)) {
     if(useRecordedClusters){
       String randomFile = filenames[int(random(0,filenames.length-1))];
       parsePacketHere(loadBytes("recordedClusters/" + randomFile));

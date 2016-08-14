@@ -262,14 +262,14 @@ class Cluster {
         note = new Note(channel, hiTom, velocity); //clHat
         partLevel = hiTomL;
       } else if (type == 3 ) { //3=alpha particle
-        note = new Note(channel, loTom, velocity);
+        note = new Note(channel, kick, 70);
+        diff = -10;
         partLevel = loTomL;
       } else if (type == 4 ) { //4=muon 
         note = new Note(channel, snare, velocity);
         partLevel = snareL;
       } else if (type == 5 ) { //5= unknown
-        note = new Note(channel, kick, 70); //opHat
-        diff = -10;
+        note = new Note(channel, loTom, velocity); //opHat
         partLevel = kickL;
       }
       //note = new Note(channel, 75, velocity);
