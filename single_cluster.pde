@@ -269,7 +269,7 @@ class Cluster {
         note = new Note(channel, snare, velocity);
         partLevel = snareL;
       } else if (type == 5 ) { //5= unknown
-        note = new Note(channel, loTom, velocity); //opHat
+        note = new Note(channel, clHat, velocity); //opHat
         partLevel = kickL;
       }
       //note = new Note(channel, 75, velocity);

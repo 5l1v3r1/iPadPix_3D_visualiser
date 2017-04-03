@@ -1,4 +1,4 @@
-import themidibus.*; //MIDI
+import themidibus.*; //MIDI //<>//
 
 //import processing.serial.*;
 //import processing.sound.*; 
@@ -22,24 +22,24 @@ int lastTime;
 MidiBus myBus;
 boolean startedListening=false;
 
-boolean DRAW = false;
+boolean DRAW = true;
 PFont font ;
 String[] filenames;
 boolean useRecordedClusters;
 Schema schema2;
 
 void setup() {
-  //size(512, 512, P3D);
-  size(100, 100);
+  size(512, 512, P3D);
+  //size(100, 100);
   if(DRAW){
     font = loadFont ("font.vlw");
   }
   //delay(3000);
   udp_port=8123; //iPadPix port 8123
   tpx = new Clusters(udp_port);
-  myBus = new MidiBus(this, 0, 1); // Create a new MidiBus with no input device and the default Java Sound Synthesizer as the output device.
-  //myBus.list();
-  delay(3000);  //FIXME: without this delay the program doesn't run!
+  myBus = new MidiBus(this, 0, 1); // in / out Create a new MidiBus with no input device and the default Java Sound Synthesizer as the output device.
+  myBus.list();
+  delay(5000);  //FIXME: without this delay the program doesn't run!
   //tpx.stopListening();
   lastTime = millis();
   java.io.File folder= new java.io.File(dataPath("/Users/ozel/Documents/Processing/iPadPix_3D_visualiser/recordedClusters"));
