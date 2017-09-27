@@ -275,7 +275,7 @@ class Cluster {
       //note = new Note(channel, 75, velocity);
 
       myBus.sendNoteOn(note);
-      ControlChange change = new ControlChange(channel, partLevel, round(map(totalEnergy,4, 5*1000,40,127))+diff);
+      ControlChange change = new ControlChange(channel, partLevel, round(map(totalEnergy,4, 9*1000,40,127))+diff);
       //myBus.sendControllerChange(change); // Send a controllerChange
       played=true;
       delay(round(random(0, 100)));
